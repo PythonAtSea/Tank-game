@@ -17,7 +17,7 @@ class Tank:
         self.ang=ang
         self.x=x
         self.y=y
-        self.speed=0.6
+        self.speed=1
         self.lives=3
         self.lastharmtime=0
     def draw(self):
@@ -54,7 +54,10 @@ class Tank:
             dx *= -0.5
             dy *= -0.5
         if keys[self.crtls[4]]:
-            self.harm()
+            #self.harm()
+            self.speed=3
+        else:
+            self.speed=1
         print(self.x)
         print(self.y)
         if self.x <= 0:
@@ -65,20 +68,27 @@ class Tank:
             self.y += dy*self.speed
         if self.y >= height:
             self.y += dy*self.speed
+        if self.ang>360:
+            self.ang-=360
+        if self.ang<0:
+            self.ang+=360
+        
         for wall in walls:
-            if pygame.Rect(wall.x-wall.img.get_width()/2, wall.x-wall.img.get_height()/2, wall.img.get_width(), wall.img.get_height()).colliderect(pygame.Rect(self.x-30, self.y-30, 60, 1)):
+            if pygame.Rect(wall.x-wall.img.get_width()/2, wall.y-wall.img.get_height()/2, wall.img.get_width(), wall.img.get_height()).colliderect(pygame.Rect(self.x-30, self.y-30, 60, 1)):
                 self.y+=dy*self.speed
                 print("!")
-            if pygame.Rect(wall.x-wall.img.get_width()/2, wall.x-wall.img.get_height()/2, wall.img.get_width(), wall.img.get_height()).colliderect(pygame.Rect(self.x-30, self.y+30, 60, 1)):
+            if pygame.Rect(wall.x-wall.img.get_width()/2, wall.y-wall.img.get_height()/2, wall.img.get_width(), wall.img.get_height()).colliderect(pygame.Rect(self.x-30, self.y+30, 60, 1)):
                 self.y+=dy*self.speed
                 print("!")
-            if pygame.Rect(wall.x-wall.img.get_width()/2, wall.x-wall.img.get_height()/2, wall.img.get_width(), wall.img.get_height()).colliderect(pygame.Rect(self.x+30, self.y+30, 1, -60)):
+            if pygame.Rect(wall.x-wall.img.get_width()/2, wall.y-wall.img.get_height()/2, wall.img.get_width(), wall.img.get_height()).colliderect(pygame.Rect(self.x+30, self.y+30, 1, -60)):
                 self.x+=dx*self.speed
                 print("!")
-            if pygame.Rect(wall.x-wall.img.get_width()/2, wall.x-wall.img.get_height()/2, wall.img.get_width(), wall.img.get_height()).colliderect(pygame.Rect(self.x-30, self.y+30, 1, -60)):
+            elif pygame.Rect(wall.x-wall.img.get_width()/2, wall.y-wall.img.get_height()/2, wall.img.get_width(), wall.img.get_height()).colliderect(pygame.Rect(self.x-30, self.y+30, 1, -60)):
                 self.x+=dx*self.speed
                 print("!")
-            print(wall)
+            #print(wall.x)
+            #print(wall.y)
+            print(self.ang)
         
     def harm(self):
         if (time.time()-self.lastharmtime)>2:
@@ -135,10 +145,14 @@ background = pygame.image.load("/home/hudson/Pygame-dev/Tank-game/Images/landsca
 tankB=Tank(pygame.image.load("/home/hudson/Pygame-dev/Tank-game/Images/tankB.png").convert_alpha(), (pygame.K_w,pygame.K_a,pygame.K_s,pygame.K_d,pygame.K_q), 180, 500, 300)
 
 #Walls
-walls=[Wall(200, 200, False, pygame.image.load("/home/hudson/Pygame-dev/Tank-game/Images/wall.png").convert()), Wall(800, 200, True, pygame.transform.rotate(pygame.image.load("/home/hudson/Pygame-dev/Tank-game/Images/wall.png").convert(),90))]
+walls=(Wall(200, 200, False, pygame.image.load("/home/hudson/Pygame-dev/Tank-game/Images/wall.png").convert()), 
+       Wall(800, 200, True, pygame.transform.rotate(pygame.image.load("/home/hudson/Pygame-dev/Tank-game/Images/wall.png").convert(),90)),
+       Wall(200, 400, False, pygame.image.load("/home/hudson/Pygame-dev/Tank-game/Images/wall.png").convert()))
 
 #Game loop
+clock=pygame.time.Clock()
 while running:
+    clock.tick(120)
     events=pygame.event.get()
     for event in events:
         if event.type == pygame.QUIT:
